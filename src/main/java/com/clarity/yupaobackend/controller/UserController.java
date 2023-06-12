@@ -33,6 +33,12 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    /**
+     * 用户注册
+     *
+     * @param userRegisterRequest 用户注册请求
+     * @return 通用返回类
+     */
     @PostMapping("/register")
     // 此处@RequestBody的意义是：使得前端的请求的数据会去，对于此注册请求体类
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
@@ -52,6 +58,13 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    /**
+     * 用户登录
+     *
+     * @param userLoginRequest 用户登录请求
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/login")
     // 此处@RequestBody的意义是：使得前端的请求的数据会去，对于此注册请求体类
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
@@ -68,15 +81,27 @@ public class UserController {
         return ResultUtils.success(user);
     }
 
+    /**
+     * 用户注销
+     *
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/logout")
     public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "请求为空");
         }
         int i = userService.userLogout(request);
         return ResultUtils.success(i);
     }
 
+    /**
+     * 获取当前在线用户
+     *
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @GetMapping("/current")
     public BaseResponse<User> getCurrent(HttpServletRequest request) {
         User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
@@ -94,10 +119,17 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
+    /**
+     * 获取所有用户（仅管理员可用）
+     *
+     * @param username 用户昵称
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         if (request == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "请求为空");
         }
         List<User> list = userService.searchUsers(username, request);
         return ResultUtils.success(list);
@@ -119,15 +151,29 @@ public class UserController {
         return ResultUtils.success(userPage);
     }
 
+    /**
+     * 用户删除（仅管理员可用）
+     *
+     * @param id 用户 id
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @DeleteMapping("/")
     public BaseResponse<Integer> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (id <= 0) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "用户ID不合法");
         }
         int i = userService.deleteUser(id, request);
         return ResultUtils.success(i);
     }
 
+    /**
+     * 用户更新
+     *
+     * @param user 用户信息
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/update")
     public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         if (user == null) {

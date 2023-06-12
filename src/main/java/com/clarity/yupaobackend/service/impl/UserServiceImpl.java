@@ -72,8 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAM_ERROR, "用户编码过长");
         }
         // 账号不能包含特殊字符
-        String validPattern = "[ _`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\\n|\\r|\\t";
-        Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
+        Matcher matcher = Pattern.compile(VALID_SPECIAL_CHARACTER).matcher(userAccount);
         if (matcher.find()) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "账号不能包含特殊字符");
         }
@@ -96,7 +95,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAM_ERROR, "用户编码重复");
         }
         // 2. 加密，这里用简单的单向加密，采用Spring提供的加密工具
-
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         // 3. 插入数据
         User user = new User();
@@ -128,8 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAM_ERROR, "用户密码过短");
         }
         // 账号不能包含特殊字符
-        String validPattern = "[ _`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\\n|\\r|\\t";
-        Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
+        Matcher matcher = Pattern.compile(VALID_SPECIAL_CHARACTER).matcher(userAccount);
         if (matcher.find()) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "账号不能包含特殊字符");
         }
@@ -163,14 +160,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "你不是管理员，无法使用查询功能");
         }
-        // StringUtils.isNotBlank判断是空字符串，还空格字符串，还null，如果是返回true
-        QueryWrapper<User> queryWrapper = new QueryWrapper();
+        // StringUtils.isNotBlank 判断是空字符串，还空格字符串，还null，如果是返回true
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("username", username);
         }
         List<User> userList = userMapper.selectList(queryWrapper);
         // 注意以下这段代码是 java 8的写法，不会要去补。
-        return userList.stream().map(user -> this.getSafetyUser(user)).collect(Collectors.toList());
+        // Lambda 表达式
+        // return userList.stream().map(user -> this.getSafetyUser(user)).collect(Collectors.toList());
+        // 方法引用 this 当前类的对象
+        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 
     @Override
@@ -207,7 +207,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User getLoginUser(HttpServletRequest request) {
         // 请求不能为空
         if (request == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "请求为空");
         }
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         if (userObj == null) {
@@ -282,7 +282,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         userQueryWrapper.in("id", userIdList);
         Map<Long, List<User>> safetyUserIdUserListMap = this.list(userQueryWrapper)
                 .stream()
-                .map(user -> getSafetyUser(user))
+                .map(this::getSafetyUser)
                 .collect(Collectors.groupingBy(User::getId));
         List<User> finalUserList = new ArrayList<>();
         for (Long userId : userIdList) {
@@ -371,7 +371,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 如果是管理员可以修改任意用户信息
         // 如果是用户可以修改自己的用户信息
-        if ( !isAdmin(loginUser) && user.getId() != loginUser.getId()) {
+        if (!isAdmin(loginUser) && user.getId() != loginUser.getId()) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
         // 根据 id 在数据库中查找用户,判断该用户是否存在

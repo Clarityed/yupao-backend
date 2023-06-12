@@ -27,8 +27,8 @@ public class Knife4jConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(new ApiInfoBuilder()
                         //描述字段支持Markdown语法
-                        .title("用户中心")
-                        .description("用户中心接口文档")
+                        .title("伙伴匹配系统")
+                        .description("伙伴匹配系统接口文档")
                         .termsOfServiceUrl("https://doc.xiaominfo.com/")
                         .version("1.0")
                         .build())

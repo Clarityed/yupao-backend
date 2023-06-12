@@ -24,4 +24,6 @@ public interface UserConstant {
      */
     String SERVER_REDIS_LOCK_KEY = "yupao:user:recommend:";
 
+    String VALID_SPECIAL_CHARACTER = "[ _`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\\n|\\r|\\t";
+
 }

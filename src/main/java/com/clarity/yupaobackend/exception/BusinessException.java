@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 自定义异常类
  *
- * @author: scott
+ * @author: clarity
  * @date: 2022年08月16日 10:43
  */
 
