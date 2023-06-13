@@ -106,7 +106,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team>
             throw new BusinessException(ErrorCode.PARAM_ERROR, "队伍过期时间在当前时间之前");
         }
         //  3.7 校验用户最多创建 5 个队伍
-        // todo 有 bug，可能同时创建 100 个队伍
+        // todo 有 bug，可能同时创建 100 个队伍，可以用锁来解决
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userId", userId);
         long hasTeamNum = this.count(queryWrapper);
@@ -489,6 +489,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team>
         QueryWrapper<UserTeam> userJoinTeamQueryWrapper = new QueryWrapper<>();
         userJoinTeamQueryWrapper.in("teamId", teamIdList);
         List<UserTeam> userTeamList = userTeamService.list(userJoinTeamQueryWrapper);
+        // 得出队伍人数
         Map<Long, List<UserTeam>> teamIdUserTeamList = userTeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
         teamList.forEach(team -> team.setHasJoinNumber(teamIdUserTeamList.getOrDefault(team.getId(), new ArrayList<>()).size()));
         return teamList;

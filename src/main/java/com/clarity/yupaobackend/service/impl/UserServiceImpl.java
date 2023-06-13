@@ -270,6 +270,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             list.add(new Pair<>(user, distance));
         }
         // 按照编辑距离由小到大排序
+        // Pair 可以存储两个返回值，并且都能使用到
         List<Pair<User, Long>> topUserPairList = list.stream()
                 .sorted((a, b) -> (int) (a.getValue() - b.getValue()))
                 .limit(num)
@@ -350,9 +351,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             tempTagNameSet = Optional.ofNullable(tempTagNameSet).orElse(new HashSet<>());
             for (String tagName : tagNameList) {
                 if (!tempTagNameSet.contains(tagName)) {
+                    // 不符合的过滤掉
                     return false;
                 }
             }
+            // 符合的保留
             return true;
             // 要进行数据脱敏
         }).map(this::getSafetyUser).collect(Collectors.toList());

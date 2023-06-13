@@ -46,6 +46,7 @@ public class PreCacheJob {
     // Collections.singletonList 这个List中只能存放一个元素，多一个或者少一个都会导致异常。
     private final List<Long> mainUserList = Collections.singletonList(2L);
 
+    // {秒数} {分钟} {小时} {日期} {月份} {星期} {年份(可为空)}
     @Scheduled(cron = "0 15 16 * * *")
     public void doCacheRecommendUser() {
         // 使用 Redisson 获得一把锁
@@ -57,7 +58,7 @@ public class PreCacheJob {
                 for (Long userId : mainUserList) {
                     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
                     Page<User> userPage = userService.page(new Page<>(1, 20), queryWrapper);
-                    String redisKey = String.format("%s%s", SERVER_REDIS_LOCK_KEY,userId);
+                    String redisKey = String.format("%s%s", SERVER_REDIS_LOCK_KEY, userId);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     System.out.println("getLock: " + Thread.currentThread().getId());
                     // 写缓存

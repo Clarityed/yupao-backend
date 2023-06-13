@@ -135,6 +135,12 @@ public class UserController {
         return ResultUtils.success(list);
     }
 
+    /**
+     * 通过用户标签精确查询用户
+     *
+     * @param tagNameList 用户标签列表
+     * @return 通用返回类
+     */
     // @RequestParam 初步理解为关闭 SpringBoot 的错误信息返回，采用我们自己的错误信息返回
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList) {
@@ -145,6 +151,14 @@ public class UserController {
         return ResultUtils.success(userList);
     }
 
+    /**
+     * 分页查询，推荐用户（前端未实现分页）
+     *
+     * @param pageSize 页面大小
+     * @param pageNum 当前页数
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         Page<User> userPage = userService.recommendUsers(pageSize, pageNum, request);
@@ -185,7 +199,8 @@ public class UserController {
     }
 
     /**
-     * 单个用户匹配
+     * 用户匹配
+     *
      * @param num 要展示的用户数
      * @param request 请求体
      * @return 用户列表

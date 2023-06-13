@@ -48,6 +48,13 @@ public class TeamController {
     // 这里就不采用 RestFul 风格的代码形式了，没有太大差别，定义自己的一套规范就可以了
     // 或者在自己公司里，按公司的要求就行，没有一个必须的规范要求
 
+    /**
+     * 增加队伍
+     *
+     * @param teamAddRequest 创建队伍封装类
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/add")
     public BaseResponse<Long> addTeam(@RequestBody TeamAddRequest teamAddRequest, HttpServletRequest request) {
         if (teamAddRequest == null) {
@@ -60,6 +67,13 @@ public class TeamController {
         return ResultUtils.success(teamId);
     }
 
+    /**
+     * 删除队伍
+     *
+     * @param teamDeleteRequest 删除队伍封装类
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest, HttpServletRequest request) {
         if (teamDeleteRequest == null) {
@@ -73,6 +87,13 @@ public class TeamController {
         return ResultUtils.success(true);
     }
 
+    /**
+     * 更新队伍
+     *
+     * @param teamUpdateRequest 更新队伍封装类
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/update")
     public BaseResponse<Boolean> updateTeam(@RequestBody TeamUpdateRequest teamUpdateRequest, HttpServletRequest request) {
         if (teamUpdateRequest == null) {
@@ -86,6 +107,12 @@ public class TeamController {
         return ResultUtils.success(true);
     }
 
+    /**
+     * 根据 id 获取队伍
+     *
+     * @param id 队伍 id
+     * @return 通用返回类
+     */
     @GetMapping("/get")
     public BaseResponse<Team> getTeamById(long id) {
         if (id <= 0) {
@@ -98,6 +125,13 @@ public class TeamController {
         return ResultUtils.success(team);
     }
 
+    /**
+     * 查询队伍及队伍相关信息
+     *
+     * @param teamQuery 查询队伍封装类
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     // 这个接口未登录也能使用
     @GetMapping("/list")
     public BaseResponse<List<TeamUserVO>> listTeams(TeamQuery teamQuery, HttpServletRequest request) {
@@ -105,11 +139,19 @@ public class TeamController {
             throw new BusinessException(ErrorCode.PARAM_ERROR);
         }
         boolean isAdmin = userService.isAdmin(request);
+        // 查询队伍列表
         List<TeamUserVO> teamList = teamService.listTeams(teamQuery, isAdmin);
+        // 判断当前用户是否已加入队伍
         List<TeamUserVO> hasJoinSignTeamList = teamService.isUserJoinTeam(teamList, request);
         return ResultUtils.success(hasJoinSignTeamList);
     }
 
+    /**
+     * 分页查询队伍
+     *
+     * @param teamQuery 查询队伍封装类
+     * @return 通用返回类
+     */
     // todo 队伍列表展示分页
     @GetMapping("/list/page")
     public BaseResponse<Page<Team>> listTeamsPage(TeamQuery teamQuery) {
@@ -129,6 +171,13 @@ public class TeamController {
         return ResultUtils.success(teamPage);
     }
 
+    /**
+     * 加入队伍
+     *
+     * @param teamJoinRequest 加入队伍封装类
+     * @param request HttpServletRequest
+     * @return 通用返回类
+     */
     @PostMapping("/join")
     public BaseResponse<Boolean> joinTeam(@RequestBody TeamJoinRequest teamJoinRequest, HttpServletRequest request) {
         if (teamJoinRequest == null) {
